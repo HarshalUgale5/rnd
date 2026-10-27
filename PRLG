@@ -1,0 +1,54 @@
+% *** Medical Diagnosis Expert System ***
+% To start the system, type: start.
+
+start :-
+    write('Welcome to the Medical Expert System.'), nl,
+    write('Please answer with y. (yes) or n. (no)'), nl, nl,
+    
+    write('1. Does the patient have a fever? '), read(F),
+    write('2. Does the patient have a cough? '), read(C),
+    write('3. Does the patient have a headache? '), read(H),
+    write('4. Does the patient have a sore throat? '), read(S),
+    
+    nl,
+    diagnose(F, C, H, S).
+
+% Knowledge Base (Inference Rules)
+% format: diagnose(Fever, Cough, Headache, SoreThroat)
+
+diagnose(y, y, y, y) :- 
+    write('Diagnosis: The patient likely has the Flu (Influenza).'), nl.
+
+diagnose(y, y, n, y) :- 
+    write('Diagnosis: The patient might have a Viral Infection.'), nl.
+
+diagnose(n, y, n, y) :- 
+    write('Diagnosis: The patient has a Common Cold.'), nl.
+
+diagnose(y, n, y, n) :- 
+    write('Diagnosis: The patient might be suffering from Dehydration or a Migraine.'), nl.
+
+diagnose(n, n, y, n) :- 
+    write('Diagnosis: The patient likely has a Tension Headache.'), nl.
+
+diagnose(n, n, n, n) :- 
+    write('Diagnosis: The patient is perfectly Healthy!'), nl.
+
+% Fallback Rule (The underscores _ mean "any answer")
+% This runs if the user's answers don't match any of the rules above.
+diagnose(_, _, _, _) :- 
+    write('Diagnosis: Symptoms are mixed. Please consult a real doctor.'), nl.
+
+
+
+
+
+
+PowerShell Commands to Run:
+notepad expert.pl 
+
+swipl
+
+['expert.pl'].
+
+start.
