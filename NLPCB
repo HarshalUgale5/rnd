@@ -1,0 +1,21 @@
+from nltk.chat.util import Chat, reflections
+
+# 1. Define conversation patterns (Regular Expressions) and Responses
+pairs = [
+    [r"hi|hello|hey", ["Hello! How can I help you today?", "Hi there!"]],
+    [r"what is your name?", ["I am an NLP Chatbot created for the AI lab.", "I'm a Chatbot!"]],
+    [r"how are you?", ["I'm doing great, thank you!", "I'm just a script, but I'm doing fine!"]],
+    [r"my name is (.*)", ["Hello %1, nice to meet you!"]],
+    [r"(.*) (help|advice)", ["Sure, I can try to help with %1."]],
+    [r"quit|exit|bye", ["Goodbye! Have a great day!"]]
+]
+
+# 2. Initialize and start the chatbot
+def run_bot():
+    print("Chatbot started! Type 'quit' to exit.")
+    # Chat() automatically processes the inputs using NLP regex matching
+    bot = Chat(pairs, reflections)
+    bot.converse()
+
+if __name__ == "__main__":
+    run_bot()
