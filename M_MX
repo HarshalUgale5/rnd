@@ -1,0 +1,95 @@
+#include <iostream>
+using namespace std;
+
+// 1D array representing the 3x3 board (positions 0 to 8)
+char b[9] = {'_','_','_','_','_','_','_','_','_'};
+
+// Check if someone has won (Returns 10 for Computer 'X', -10 for Player 'O')
+int check() {
+    int w[8][3] = {{0,1,2},{3,4,5},{6,7,8}, {0,3,6},{1,4,7},{2,5,8}, {0,4,8},{2,4,6}};
+    for(int i = 0; i < 8; i++) {
+        if(b[w[i][0]] != '_' && b[w[i][0]] == b[w[i][1]] && b[w[i][1]] == b[w[i][2]])
+            return (b[w[i][0]] == 'X') ? 10 : -10;
+    }
+    return 0; // No winner yet
+}
+
+// Check if the board has empty spaces
+bool empty() {
+    for(int i = 0; i < 9; i++) if(b[i] == '_') return true;
+    return false;
+}
+
+// The Minimax Algorithm
+int minimax(bool isMax) {
+    int score = check();
+    if(score != 0) return score; // Base case: Someone won
+    if(!empty()) return 0;       // Base case: Tie
+
+    int best = isMax ? -1000 : 1000;
+    for(int i = 0; i < 9; i++) {
+        if(b[i] == '_') {
+            b[i] = isMax ? 'X' : 'O';        // Make a move
+            int val = minimax(!isMax);       // Recursive call for next turn
+            
+            if (isMax && val > best) best = val;       // Maximizer (Computer)
+            if (!isMax && val < best) best = val;      // Minimizer (Player)
+            
+            b[i] = '_';                      // Backtrack (undo move)
+        }
+    }
+    return best;
+}
+
+// Finds the optimal move for the computer
+void compTurn() {
+    int bestVal = -1000, move = -1;
+    for(int i = 0; i < 9; i++) {
+        if(b[i] == '_') {
+            b[i] = 'X';
+            int val = minimax(false); // Call minimax for the player's turn
+            b[i] = '_'; // Undo
+            if(val > bestVal) { 
+                bestVal = val; 
+                move = i; 
+            }
+        }
+    }
+    b[move] = 'X'; // Play the best move
+}
+
+void print() {
+    for(int i = 0; i < 9; i++) {
+        cout << b[i] << " ";
+        if(i % 3 == 2) cout << "\n";
+    }
+    cout << "\n";
+}
+
+int main() {
+    cout << "Computer is X, You are O (Positions 0-8)\n";
+    
+    while(empty() && check() == 0) {
+        print();
+        int pos;
+        cout << "Enter your move (0-8): ";
+        cin >> pos;
+        if (b[pos] != '_') {
+            cout << "Invalid move!\n";
+            continue; 
+        }
+        
+        b[pos] = 'O'; // Player's move
+        
+        if(!empty() || check() != 0) break; // End game check
+        
+        compTurn(); // Computer's turn
+    }
+    
+    print();
+    int s = check();
+    if(s == 10) cout << "Computer wins!\n";
+    else cout << "Draw! (Minimax is unbeatable)\n"; 
+    
+    return 0;
+}
