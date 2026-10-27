@@ -1,0 +1,39 @@
+import cv2
+import matplotlib.pyplot as plt
+
+# 1. Setup paths and load the Haar cascade classifier
+imagePath = "test.jpg"  # Ensure you have a test.jpg in your folder
+# Using cv2.data.haarcascades ensures you don't need to manually download the XML file
+cascPath = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+faceCascade = cv2.CascadeClassifier(cascPath)
+
+# 2. Read the image and convert to grayscale for the algorithm
+image = cv2.imread(imagePath)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# 3. Detect faces using the parameters from the assignment
+faces = faceCascade.detectMultiScale(
+    gray,
+    scaleFactor=1.1,
+    minNeighbors=5,
+    minSize=(30, 30),
+    flags=cv2.CASCADE_SCALE_IMAGE
+)
+
+print("Found {0} faces!".format(len(faces)))
+
+# 4. Draw green rectangles around the detected faces
+for (x, y, w, h) in faces:
+    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+# 5. Convert OpenCV's default BGR format to RGB for Matplotlib, then display
+RGB_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+plt.imshow(RGB_img)
+plt.show()
+
+
+
+
+pip install opencv-python matplotlib
+notepad face.py
+python face.py
