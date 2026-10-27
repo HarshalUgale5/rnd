@@ -1,0 +1,89 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <set>
+
+using namespace std;
+
+string GOAL = "123804765"; 
+
+int get_h(string s) {
+    int h = 0;
+    for (int i = 0; i < 9; i++) {
+        if (s[i] != '0' && s[i] != GOAL[i]) h++;
+    }
+    return h;
+}
+
+struct Node {
+    string state;
+    int g, f; 
+    vector<string> path; 
+};
+
+// Custom comparator for the priority queue to avoid using const
+struct CompareNode {
+    bool operator()(Node a, Node b) {
+        return a.f > b.f;
+    }
+};
+
+vector<string> get_neighbors(string s) {
+    vector<string> neighbors;
+    int z = s.find('0'); 
+    int r = z / 3, c = z % 3; 
+    
+    int dr[] = {-1, 1, 0, 0};
+    int dc[] = {0, 0, -1, 1}; 
+
+    for (int i = 0; i < 4; i++) {
+        int nr = r + dr[i], nc = c + dc[i];
+        if (nr >= 0 && nr < 3 && nc >= 0 && nc < 3) {
+            string next_s = s;
+            swap(next_s[z], next_s[nr * 3 + nc]);
+            neighbors.push_back(next_s);
+        }
+    }
+    return neighbors;
+}
+
+void solve_a_star(string start) {
+    // Uses the custom CompareNode struct instead of std::greater
+    priority_queue<Node, vector<Node>, CompareNode> pq;
+    set<string> visited;
+
+    pq.push({start, 0, get_h(start), {start}});
+
+    while (!pq.empty()) {
+        Node curr = pq.top();
+        pq.pop();
+
+        if (curr.state == GOAL) {
+            cout << "Optimal Path found in " << curr.g << " moves:\n\n";
+            for (string step : curr.path) {
+                for (int i = 0; i < 9; i += 3)
+                    cout << step.substr(i, 3) << "\n";
+                cout << "-----\n";
+            }
+            return;
+        }
+
+        if (visited.count(curr.state)) continue;
+        visited.insert(curr.state);
+
+        for (string next_s : get_neighbors(curr.state)) {
+            if (!visited.count(next_s)) {
+                vector<string> new_path = curr.path;
+                new_path.push_back(next_s);
+                pq.push({next_s, curr.g + 1, curr.g + 1 + get_h(next_s), new_path});
+            }
+        }
+    }
+    cout << "No solution found.\n";
+}
+
+int main() {
+    string start = "134802765"; 
+    solve_a_star(start);
+    return 0;
+}
