@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int n = 4;
+// Adjacency matrix for the distance between 4 cities
+int dist[4][4] = {
+    {0, 10, 15, 20},
+    {10, 0, 35, 25},
+    {15, 35, 0, 30},
+    {20, 25, 30, 0}
+};
+
+// Function to calculate the total distance of a route
+int cost(vector<int>& r) {
+    int c = 0;
+    for(int i = 0; i < n - 1; i++) c += dist[r[i]][r[i+1]];
+    return c + dist[r[n-1]][r[0]]; // Add return trip to start
+}
+
+int main() {
+    vector<int> curr = {0, 1, 2, 3}; // Initial random route
+    
+    while(true) {
+        vector<int> bestR = curr;
+        int bestC = cost(curr);
+
+        // Generate neighbor states by swapping cities
+        for(int i = 1; i < n; i++) {       // Keep city 0 as the fixed start
+            for(int j = i + 1; j < n; j++) {
+                vector<int> neighbor = curr;
+                swap(neighbor[i], neighbor[j]);
+                
+                if(cost(neighbor) < bestC) {
+                    bestC = cost(neighbor);
+                    bestR = neighbor;
+                }
+            }
+        }
+        
+        // If no neighbor is better, we reached the local peak
+        if(bestC >= cost(curr)) break; 
+        curr = bestR;
+    }
+
+    cout << "Optimal Tour Distance: " << cost(curr) << "\n";
+    cout << "Tour: ";
+    for(int city : curr) cout << city << " ";
+    cout << "0\n"; // Back to start
+    
+    return 0;
+}
