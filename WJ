@@ -1,0 +1,38 @@
+#include <iostream>
+using namespace std;
+
+int X = 4, Y = 3, Z = 2;
+bool vis[5][4]; // Tracks visited states to prevent infinite loops
+
+bool dfs(int a, int b) {
+    // Base Case: We hit the target state
+    if(a == Z || b == Z) {
+        cout << "Target Reached: (" << a << "," << b << ")\n";
+        return true;
+    }
+    
+    if(vis[a][b]) return false;
+    vis[a][b] = true;
+
+    // Calculate how much we can pour from one jug to another
+    int p1 = min(a, Y - b); // Pour A to B
+    int p2 = min(b, X - a); // Pour B to A
+
+    // Explore the State Space: Fill, Empty, or Pour
+    if(dfs(X, b) || dfs(a, Y) || dfs(0, b) || dfs(a, 0) || 
+       dfs(a - p1, b + p1) || dfs(a + p2, b - p2)) {
+        
+        // Prints the successful steps in reverse order (bottom-up)
+        cout << "Step: (" << a << "," << b << ")\n";
+        return true;
+    }
+    return false;
+}
+
+int main() {
+    cout << "Format: (Jug 4L, Jug 3L)\n";
+    if(!dfs(0, 0)) {
+        cout << "No solution possible.\n";
+    }
+    return 0;
+}
