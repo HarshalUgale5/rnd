@@ -1,21 +1,46 @@
-from nltk.chat.util import Chat, reflections
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import warnings
+warnings.filterwarnings('ignore')
 
-# 1. Define conversation patterns (Regular Expressions) and Responses
-pairs = [
-    [r"hi|hello|hey", ["Hello! How can I help you today?", "Hi there!"]],
-    [r"what is your name?", ["I am an NLP Chatbot created for the AI lab.", "I'm a Chatbot!"]],
-    [r"how are you?", ["I'm doing great, thank you!", "I'm just a script, but I'm doing fine!"]],
-    [r"my name is (.*)", ["Hello %1, nice to meet you!"]],
-    [r"(.*) (help|advice)", ["Sure, I can try to help with %1."]],
-    [r"quit|exit|bye", ["Goodbye! Have a great day!"]]
-]
+# 1. Hardcoded text (Bypasses internet web-scraping)
+corpus = """
+Chronic kidney disease involves a gradual loss of kidney function.
+Your kidneys filter wastes and excess fluids from your blood.
+Advanced chronic kidney disease can cause dangerous levels of fluid to build up.
+In the early stages, you might have few signs or symptoms.
+Treatment focuses on slowing the progression of kidney damage.
+"""
 
-# 2. Initialize and start the chatbot
-def run_bot():
-    print("Chatbot started! Type 'quit' to exit.")
-    # Chat() automatically processes the inputs using NLP regex matching
-    bot = Chat(pairs, reflections)
-    bot.converse()
+# 2. Native Python sentence splitting (Bypasses NLTK downloads)
+sentence_list = [s.strip() for s in corpus.split('.') if s.strip()]
 
-if __name__ == "__main__":
-    run_bot()
+def bot_response(user_input):
+    sentence_list.append(user_input)
+    
+    # 3. Vectorization and Cosine Similarity
+    cm = CountVectorizer().fit_transform(sentence_list)
+    similarity_scores = cosine_similarity(cm[-1], cm)
+    
+    # Find the best match (excluding the user input itself)
+    idx = similarity_scores.argsort()[0][-2]
+    
+    flat = similarity_scores.flatten()
+    flat.sort()
+    score = flat[-2]
+    
+    if score == 0:
+        bot_reply = "I apologize, I don't understand."
+    else:
+        bot_reply = sentence_list[idx] + "."
+        
+    sentence_list.remove(user_input)
+    return bot_reply
+
+print("Bot: Ask me about kidney disease! (Type 'quit' to exit)")
+while True:
+    user_input = input("You: ").lower()
+    if user_input == 'quit':
+        print("Bot: Goodbye!")
+        break
+    print("Bot:", bot_response(user_input))
